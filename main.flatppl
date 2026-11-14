@@ -1,0 +1,18 @@
+%%%
+# Gaussian processes
+
+Covariance functions, marginalized Gaussian regression and joint conditional
+prediction. Observation standard deviations and numerical jitter are explicit.
+%%%
+flatppl_compat = "0.1"
+covariances = load_module("src/covariances.flatppl")
+regression = load_module("src/regression.flatppl")
+pairwise_distance = covariances.pairwise_distance
+squared_exponential = covariances.squared_exponential
+matern32 = covariances.matern32
+matern52 = covariances.matern52
+periodic = covariances.periodic
+observation_covariance = regression.observation_covariance
+gaussian_regression = regression.gaussian_regression
+conditional_moments = regression.conditional_moments
+predictive_law = regression.predictive_law

@@ -1,0 +1,29 @@
+%%%
+# Smooth Gaussian process regression
+
+Infer an amplitude, length scale and observation standard deviation from six
+synthetic observations. Inputs and responses are dimensionless. The latent
+function is integrated out; the posterior contains three log hyperparameters.
+%%%
+flatppl_compat = "0.1"
+gp = load_module("../main.flatppl")
+
+x_data = [-1.5, -0.9, -0.3, 0.3, 0.9, 1.5]
+y_data = [-0.8, -0.7, -0.2, 0.4, 0.8, 0.7]
+distance = gp.pairwise_distance(x_data, x_data)
+mean = zeros(6)
+jitter = 1e-8
+
+log_amplitude ~ Normal(0.0, 0.5)
+log_length_scale ~ Normal(0.0, 0.5)
+log_noise_sd ~ Normal(log(0.2), 0.5)
+amplitude = exp(log_amplitude)
+length_scale = exp(log_length_scale)
+noise_sd = exp(log_noise_sd)
+covariance = gp.squared_exponential(distance, amplitude, length_scale)
+y ~ gp.gaussian_regression(mean, covariance, noise_sd, jitter)
+
+prior = lawof(record(log_amplitude = log_amplitude, log_length_scale = log_length_scale, log_noise_sd = log_noise_sd))
+forward = kernelof(record(y = y), log_amplitude, log_length_scale, log_noise_sd)
+L = likelihoodof(forward, record(y = y_data))
+Pi_post = bayesupdate(L, prior)
