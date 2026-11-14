@@ -1,0 +1,28 @@
+%%%
+# Stationary covariance functions
+
+Amplitude is a response standard deviation. Distances are nonnegative, and
+length scales and periods are positive. Kernel calls act elementwise.
+%%%
+flatppl_compat = "0.1"
+
+% Absolute distances between two vectors of scalar coordinates; shape n by m.
+pairwise_distance(x, z) = abs.(addaxes(x, 0, 1) .- addaxes(z, 1, 0))
+
+% Squared-exponential covariance, also called the exponentiated quadratic.
+squared_exponential(distance, amplitude, length_scale) =
+    amplitude^2 .* exp.(-0.5 .* (distance ./ length_scale).^2)
+
+_matern32(r, amplitude) = amplitude^2 * (1 + r) * exp(-r)
+% Matern covariance with smoothness 3/2.
+matern32(distance, amplitude, length_scale) =
+    _matern32.(sqrt(3.0) .* distance ./ length_scale, amplitude)
+
+_matern52(r, amplitude) = amplitude^2 * (1 + r + r^2 / 3) * exp(-r)
+% Matern covariance with smoothness 5/2.
+matern52(distance, amplitude, length_scale) =
+    _matern52.(sqrt(5.0) .* distance ./ length_scale, amplitude)
+
+% Periodic covariance; its length_scale is dimensionless, period has input units.
+periodic(separation, amplitude, length_scale, period) =
+    amplitude^2 .* exp.(-2 .* (sin.(pi .* separation ./ period) ./ length_scale).^2)

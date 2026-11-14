@@ -1,0 +1,50 @@
+%%%
+# Gaussian process values and sensitivities
+
+Inputs are log amplitude, log length scale, log observation SD, log period and
+a prediction coordinate. Outputs include coincident kernels, conditioning and
+Gaussian scores. Observation jitter is a variance of 0.0001.
+%%%
+flatppl_compat = "0.1"
+gp = load_module("../main.flatppl")
+x = elementof(cartpow(reals, 5))
+amplitude = exp(x[1])
+length_scale = exp(x[2])
+noise_sd = exp(x[3])
+period = exp(x[4])
+train = [0.0, 1.0]
+test = [x[5], 1.5]
+train_distance = gp.pairwise_distance(train, train)
+cross_distance = gp.pairwise_distance(train, test)
+test_distance = gp.pairwise_distance(test, test)
+covariance = gp.squared_exponential(train_distance, amplitude, length_scale)
+training = gp.observation_covariance(covariance, noise_sd, 0.0001)
+cross_covariance = gp.squared_exponential(cross_distance, amplitude, length_scale)
+test_covariance = gp.squared_exponential(test_distance, amplitude, length_scale)
+moments = gp.conditional_moments([0.7, -0.2], [0.1, -0.1], training, [0.2, 0.3], cross_covariance, test_covariance)
+coincident = gp.pairwise_distance([x[5]], [x[5]])[1, 1]
+inputs = x
+outputs = [
+    gp.squared_exponential(0.0, amplitude, length_scale),
+    gp.matern32(0.0, amplitude, length_scale),
+    gp.matern52(0.0, amplitude, length_scale),
+    gp.periodic(0.0, amplitude, length_scale, period),
+    gp.squared_exponential(0.7, amplitude, length_scale),
+    gp.matern32(0.7, amplitude, length_scale),
+    gp.matern52(0.7, amplitude, length_scale),
+    gp.periodic(0.7, amplitude, length_scale, period),
+    gp.squared_exponential(coincident, amplitude, length_scale),
+    gp.matern32(coincident, amplitude, length_scale),
+    gp.matern52(coincident, amplitude, length_scale),
+    gp.periodic(coincident, amplitude, length_scale, period),
+    logdensityof(gp.gaussian_regression([0.1, -0.1], covariance, noise_sd, 0.0001), [0.7, -0.2]),
+    moments.mean[1],
+    moments.mean[2],
+    moments.covariance[1, 1],
+    moments.covariance[1, 2],
+    moments.covariance[2, 2],
+    logdensityof(gp.predictive_law(moments, 0.0, 0.0001), [0.4, -0.1]),
+    logdensityof(gp.predictive_law(moments, noise_sd, 0.0001), [0.4, -0.1]),
+    gp.matern32(abs(x[5]), amplitude, length_scale),
+    gp.matern52(abs(x[5]), amplitude, length_scale),
+]
