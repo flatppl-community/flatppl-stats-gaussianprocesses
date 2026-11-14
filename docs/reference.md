@@ -170,3 +170,24 @@ in its function reference. The tests independently recover SE and Matern
 covariances by integrating smoothing-filter autocorrelations, factor Gaussian
 densities into scalar conditional densities and obtain predictive moments by
 successive scalar conditioning.
+
+## Examples and validation
+
+The [live regression example](https://live.flatppl.org/#model=https%3A%2F%2Fraw.githubusercontent.com%2Fflatppl-community%2Fflatppl-stats-gaussianprocesses%2Fmain%2Fexamples%2Fplayground.flatppl&target=Pi_post) infers three covariance and
+noise parameters with proper priors and an explicit prior, kernel, likelihood
+and posterior. The latent function is integrated out. Conditional prediction
+keeps hyperparameters fixed; averaging over their posterior is a separate step.
+
+Squared-exponential, Matern 3/2, Matern 5/2 and one-dimensional periodic
+covariances are included. Observation noise is a standard deviation; numerical
+jitter is a separate variance. Every call supplies both explicitly.
+
+Run the independent scalar Gaussian checks with Python 3.10+ and Node 24+:
+
+```sh
+FLATPPL_JS_DIR=/path/to/flatppl-js python tests/check_math.py
+```
+
+[The runtime fixture](../tests/runtime.flatppl) and the independent `runtime_values`
+function in [the checker](../tests/check_math.py) support value and gradient checks,
+including coincident coordinates.
