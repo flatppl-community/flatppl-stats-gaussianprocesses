@@ -6,7 +6,7 @@ synthetic observations. Inputs and responses are dimensionless. The latent
 function is integrated out; the posterior contains three log hyperparameters.
 %%%
 flatppl_compat = "0.1"
-gp = load_module("../main.flatppl")
+gp = load_module("https://raw.githubusercontent.com/flatppl-community/flatppl-stats-gaussianprocesses/50923c9d9a0eb3bd4bcbced2f6511c8d9027790e/main.flatppl")
 
 x_data = [-1.5, -0.9, -0.3, 0.3, 0.9, 1.5]
 y_data = [-0.8, -0.7, -0.2, 0.4, 0.8, 0.7]

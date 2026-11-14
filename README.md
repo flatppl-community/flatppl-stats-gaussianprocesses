@@ -14,7 +14,7 @@ covariance = gp.squared_exponential(distance, 1.2, 0.8)
 observations = gp.gaussian_regression(zeros(3), covariance, 0.2, 1e-8)
 ```
 
-The [regression example](examples/playground.flatppl) infers three covariance and
+The [live regression example](https://live.flatppl.org/#model=https%3A%2F%2Fraw.githubusercontent.com%2Fflatppl-community%2Fflatppl-stats-gaussianprocesses%2Fmain%2Fexamples%2Fplayground.flatppl&target=Pi_post) infers three covariance and
 noise parameters with proper priors and an explicit prior, kernel, likelihood
 and posterior. The latent function is integrated out. Conditional prediction
 keeps hyperparameters fixed; averaging over their posterior is a separate step.
