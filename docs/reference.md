@@ -116,18 +116,18 @@ conditional distribution at fixed hyperparameters**, with arguments:
 | `observed` $y$ | length $n$ | observed training responses |
 | `mean_train` $m$ | length $n$ | prior mean at training inputs |
 | `covariance_train` $C$ | $n\times n$ | training covariance including noise and jitter |
-| `mean_test` $m_*$ | length $m$ | prior mean at prediction inputs |
+| `mean_test` $m_{\ast}$ | length $m$ | prior mean at prediction inputs |
 | `cross_covariance` $B$ | $n\times m$ | latent training-to-prediction covariance |
-| `covariance_test` $K_*$ | $m\times m$ | latent prior prediction covariance |
+| `covariance_test` $K_{\ast}$ | $m\times m$ | latent prior prediction covariance |
 
 Both $n$ and $m$ are positive. Means and responses have units $Y$; all
 covariances have units $Y^2$. The supplied blocks must describe a consistent
 joint Gaussian model, and $C$ must be positive definite. The result is
 
-$$m_c=m_*+B^TC^{-1}(y-m),\qquad S_c=K_*-B^TC^{-1}B.$$
+$$m_c=m_{\ast}+B^TC^{-1}(y-m),\qquad S_c=K_{\ast}-B^TC^{-1}B.$$
 
 The implementation factors $C=LL^T$ once and uses triangular solves:
-$V=L^{-1}B$, $m_c=m_*+V^TL^{-1}(y-m)$ and $S_c=K_*-V^TV$.
+$V=L^{-1}B$, $m_c=m_{\ast}+V^TL^{-1}(y-m)$, and $S_c=K_{\ast}-V^TV$.
 One matrix solve handles all columns of $B$. No matrix inverse is constructed.
 The result retains dependence between prediction locations.
 
@@ -135,7 +135,7 @@ The result retains dependence between prediction locations.
 
 `predictive_law(moments, noise_sd, jitter)` returns the normalized joint law
 
-$$N\left(m_c,S_c+\mathrm{diag}(\sigma_{*,1}^2+j_*,\ldots,\sigma_{*,m}^2+j_*)\right).$$
+$$N\left(m_c,S_c+\mathrm{diag}(\sigma_{\ast,1}^2+j_{\ast},\ldots,\sigma_{\ast,m}^2+j_{\ast})\right).$$
 
 Use `noise_sd = 0` for the latent function, or supply the prediction observation
 standard deviations for future noisy responses. Prediction jitter is a separate,
