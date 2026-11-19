@@ -5,28 +5,27 @@ The training covariance includes observation noise and numerical jitter before
 conditioning. Cross-covariances contain latent process covariance only.
 %%%
 flatppl_compat = "0.1"
+linalg = standard_module("ext-linear-algebra", "0.1")
 
-% Add independent observation variances and a scalar numerical variance jitter.
+% K + diag(noise_sd.^2 + jitter); K is n by n, noise_sd is scalar or length n.
 observation_covariance(covariance, noise_sd, jitter) = covariance + diagmat(
     zeros(sizeof(covariance)[1]) .+ noise_sd.^2 .+ jitter
 )
 
-% Marginal Gaussian observation law with the latent function integrated out.
+% MvNormal(mean, K + diag(noise_sd.^2 + jitter)); mean has length n.
 gaussian_regression(mean, covariance, noise_sd, jitter) =
     MvNormal(mean, observation_covariance(covariance, noise_sd, jitter))
 
-# linsolve has a vector RHS in FlatPPL. Singleton arrays hold the matrices
-# constant while the helper solves one column per prediction location.
-_solve_column(i, factor, cross_covariance) = linsolve(factor, cross_covariance[:, i])
+# One triangular matrix solve whitens all prediction columns together.
 _conditional_whitened(observed, mean_train, factor, mean_test, covariance_test, whitened) = record(
-    mean = mean_test + transpose(whitened) * linsolve(factor, observed - mean_train),
+    mean = mean_test + transpose(whitened) * linalg.solve_triangular(factor, observed - mean_train),
     covariance = covariance_test - col_gram(whitened)
 )
 _conditional_factored(observed, mean_train, factor, mean_test, cross_covariance, covariance_test) =
     _conditional_whitened(observed, mean_train, factor, mean_test, covariance_test,
-        colstack(_solve_column.(indicesof(mean_test), [factor], [cross_covariance])))
+        linalg.solve_triangular(factor, cross_covariance))
 
-% Joint latent conditional mean and covariance for fixed hyperparameters.
+% Joint latent conditional moments; training C is n by n, cross B is n by m.
 conditional_moments(observed, mean_train, covariance_train, mean_test, cross_covariance, covariance_test) =
     _conditional_factored(observed, mean_train, lower_cholesky(covariance_train),
         mean_test, cross_covariance, covariance_test)

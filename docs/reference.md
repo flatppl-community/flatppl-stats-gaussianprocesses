@@ -126,11 +126,10 @@ joint Gaussian model, and $C$ must be positive definite. The result is
 
 $$m_c=m_*+B^TC^{-1}(y-m),\qquad S_c=K_*-B^TC^{-1}B.$$
 
-The implementation factors $C=LL^T$ once and uses vector linear solves:
+The implementation factors $C=LL^T$ once and uses triangular solves:
 $V=L^{-1}B$, $m_c=m_*+V^TL^{-1}(y-m)$ and $S_c=K_*-V^TV$.
-Each column of $B$ is solved separately because FlatPPL's `linsolve` specifies
-a vector right-hand side. No matrix inverse is constructed. The result retains
-dependence between prediction locations.
+One matrix solve handles all columns of $B$. No matrix inverse is constructed.
+The result retains dependence between prediction locations.
 
 ### `predictive_law`
 
@@ -177,10 +176,6 @@ The [live regression example](https://live.flatppl.org/#model=https%3A%2F%2Fraw.
 noise parameters with proper priors and an explicit prior, kernel, likelihood
 and posterior. The latent function is integrated out. Conditional prediction
 keeps hyperparameters fixed; averaging over their posterior is a separate step.
-
-Squared-exponential, Matern 3/2, Matern 5/2 and one-dimensional periodic
-covariances are included. Observation noise is a standard deviation; numerical
-jitter is a separate variance. Every call supplies both explicitly.
 
 Run the independent scalar Gaussian checks with Python 3.10+ and Node 24+:
 
