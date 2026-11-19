@@ -16,8 +16,8 @@ observations = gp.gaussian_regression(zeros(3), covariance, 0.2, 1e-8)
 Covariances include squared-exponential, Matérn 3/2, Matérn 5/2, and one-dimensional periodic kernels.
 
 For $n$ training points, the observation law is $N(\mu,C)$ with
-$C=K+\operatorname{diag}(\sigma_1^2+j,\ldots,\sigma_n^2+j)$ and $K$ of shape $n\times n$.
-Prediction takes an $n\times m$ cross-covariance and returns a length-$m$ mean
+$C=K+\mathrm{diag}(\sigma_1^2+j,\ldots,\sigma_n^2+j)$ and $K$ of shape $n\times n$.
+Prediction takes an $n\times m$ cross-covariance and returns a mean vector of length $m$
 and an $m\times m$ covariance. Observation and prediction laws require positive-definite covariance.
 
 The [regression example](examples/playground.flatppl) infers three covariance and noise parameters with proper priors. It integrates out the latent function.
